@@ -1,0 +1,29 @@
+name: Publish release
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'package.json' ]
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Detect version
+      uses: EndBug/version-check@v1
+      id: check
+      with:
+        diff-search: true
+    - if: steps.check.outputs.changed == 'true'
+      run: npm ci
+    - name: Package
+      if: steps.check.outputs.changed == 'true'
+      run: npm run package
+    - name: publish to Github
+      uses: ncipollo/release-action@v1
+      if: steps.check.outputs.changed == 'true'
+      with:
+        artifacts: "qqol-*.vsix"
+        tag: ${{ steps.check.outputs.version }}
+        commit: ${{ steps.check.outputs.commit }}
+        token: ${{ secrets.GITHUB_TOKEN }}
