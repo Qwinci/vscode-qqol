@@ -37,18 +37,11 @@ function backspace() {
 		}
 		
 		const text = line.text.substring(0, start.character);
-		if (text === "\t" && start.character === 1) {
+		const match = /^[\t ]+$/.exec(text);
+		if (match) {
 			hasNewSelections = true;
 			const anchor = prevLine.range.end;
 			return new vscode.Selection(anchor, start);
-		}
-		else if (start.character === tabSize) {
-			const match = /^ +$/.exec(text);
-			if (match && match[0].length === tabSize) {
-				hasNewSelections = true;
-				const anchor = prevLine.range.end;
-				return new vscode.Selection(anchor, start);
-			}
 		}
 
 		return selection;
