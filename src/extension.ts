@@ -8,8 +8,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand("qqol.backspaceLeft", backspace));
 }
 
-function isOpenParen(c: string): boolean {
-	return c === "(" || c === '{' || c === '[' || c === '<' || c === "\"" || c === "'";
+function areMatchingParens(start: string, end: string): boolean {
+	return (start === "(" && end === ")") || (start === "{" && end === "}") ||
+		(start === "[" && end === "]") || (start === "<" && end === ">") ||
+		(start === "\"" && end === "\"") || (start === "'" && end === "'");
 }
 
 function backspace() {
@@ -35,7 +37,8 @@ function backspace() {
 				new vscode.Position(start.line, start.character - 1);
 			selection = new vscode.Selection(newStart, selection.end);
 			
-			if (selection.end.character < line.text.length && isOpenParen(line.text[selection.end.character - 1])) {
+			if (selection.end.character > 0 && selection.end.character < line.text.length &&
+				areMatchingParens(line.text[selection.end.character - 1], line.text[selection.end.character])) {
 				const newEnd = selection.end.translate(0, 1);
 				selection = new vscode.Selection(selection.start, newEnd);
 			}
@@ -49,7 +52,8 @@ function backspace() {
 			new vscode.Position(start.line, start.character - 1);
 		selection = new vscode.Selection(newStart, selection.end);
 		
-		if (selection.end.character < line.text.length && isOpenParen(line.text[selection.end.character])) {
+		if (selection.end.character > 0 && selection.end.character < line.text.length &&
+			areMatchingParens(line.text[selection.end.character - 1], line.text[selection.end.character])) {
 			const newEnd = selection.end.translate(0, 1);
 			selection = new vscode.Selection(selection.start, newEnd);
 		}
