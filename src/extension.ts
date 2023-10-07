@@ -8,6 +8,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand("qqol.backspaceLeft", backspace));
 }
 
+function isOpenParen(c: string): boolean {
+	return c === "(" || c === '{' || c === '[' || c === '<' || c === "\"" || c === "'";
+}
+
 function backspace() {
 	let editor = vscode.window.activeTextEditor;
 	if (!editor) {
@@ -24,21 +28,31 @@ function backspace() {
 		}
 
 		const start = selection.start;
+		const line = document.lineAt(start);
 		if (start.line === 0) {
 			const newStart = start.character === 0 ?
 				new vscode.Position(0, 0) :
 				new vscode.Position(start.line, start.character - 1);
 			selection = new vscode.Selection(newStart, selection.end);
+			
+			if (selection.end.character < line.text.length && isOpenParen(line.text[selection.end.character - 1])) {
+				const newEnd = selection.end.translate(0, 1);
+				selection = new vscode.Selection(selection.start, newEnd);
+			}
 			return selection;
 		}
 
-		const line = document.lineAt(start);
 		const prevLine = document.lineAt(start.line - 1);
 		
 		const newStart = start.character === 0 ?
 			new vscode.Position(start.line - 1, prevLine.text.length) :
 			new vscode.Position(start.line, start.character - 1);
 		selection = new vscode.Selection(newStart, selection.end);
+		
+		if (selection.end.character < line.text.length && isOpenParen(line.text[selection.end.character])) {
+			const newEnd = selection.end.translate(0, 1);
+			selection = new vscode.Selection(selection.start, newEnd);
+		}
 		
 		const prevFirstNonWhitespace = prevLine.firstNonWhitespaceCharacterIndex;
 		if (line.firstNonWhitespaceCharacterIndex < start.character) {

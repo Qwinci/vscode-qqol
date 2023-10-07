@@ -1,5 +1,7 @@
 # Change Log
 
+## Version 0.0.4
+- Add back deleting of matching parentheses (was removed in the last version because of the custom deletion logic)
 ## Version 0.0.3
 - Use a smarter algorithm that uses the indentation of the previous line where possible to guide the deletion
 - Replace the use of 'deleteLeft' editor command with editorBuilder.delete, this gets rid of flickering on deletions
