@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 0.0.6
+- Improve smart delete and fall back to standard vscode delete otherwise
+- Add a feature that empties lines that only contain whitespace on save
 ## Version 0.0.4
 - Add back deleting of matching parentheses (was removed in the last version because of the custom deletion logic)
 ## Version 0.0.3
